@@ -492,12 +492,12 @@ pub fn quick() -> Items {
     rows
 }
 
-/// The cable, read-only: NetworkManager brings it up on its own, and there
-/// is nothing to choose.
+/// The cable: NetworkManager brings it up on its own. Pressing the row opens
+/// the wired settings, where the address is the one thing to choose.
 fn ethernet_row(iface: &str) -> Item {
     Item {
         label: "Ethernet".into(),
-        payload: String::new(),
+        payload: format!("eth:{iface}"),
         note: address_of(iface).unwrap_or_else(|| "no address".into()),
         icon: "network-wired".into(),
         active: true,

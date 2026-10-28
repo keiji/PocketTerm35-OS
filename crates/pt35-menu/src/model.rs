@@ -714,6 +714,13 @@ impl Model {
                     // A switch stays: watching it flip is the point.
                     "sh" => Step::RunStay(Command::Helper(rest)),
                     "ctl" => Step::RunStay(Command::Action(rest)),
+                    // The cable's settings are typed, so they open in a
+                    // terminal, like joining a network does. The prefix
+                    // stays: exec.rs reads it off the payload.
+                    "eth" => Step::Run(Command::Dynamic {
+                        builtin: Builtin::Wifi,
+                        payload: payload.clone(),
+                    }),
                     // The D-pad is the whole interaction for a slider.
                     _ => Step::Nothing,
                 }
@@ -963,6 +970,23 @@ entries = [
         let mut model = model();
         assert_eq!(model.activate_window(1), Step::Open(Builtin::Windows));
         assert_eq!(model.activate_window(99), Step::Nothing);
+    }
+
+    #[test]
+    fn the_quick_ethernet_row_asks_for_its_terminal() {
+        let mut model = model();
+        model.push_dynamic(
+            Builtin::Quick,
+            "Quick settings",
+            vec![crate::providers::Item::new("Ethernet", "eth:eth0")],
+        );
+        assert_eq!(
+            press(&mut model, sym::RETURN),
+            Step::Run(Command::Dynamic {
+                builtin: Builtin::Wifi,
+                payload: "eth:eth0".into()
+            })
+        );
     }
 
     #[test]

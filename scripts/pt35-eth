@@ -1,0 +1,48 @@
+#!/bin/sh
+# pt35-eth: the wired connection settings behind the menu's Ethernet row.
+#
+# A static address is a few values to type, and the menu has no fields to
+# type them into. It opens this script in a terminal instead, the way joining
+# a network asks for its passphrase there.
+# IPv4 only: the connection's IPv6 setting is left as it is.
+set -eu
+# nmcli's answers below read English ("error", "ok").
+export LC_ALL=C.UTF-8
+unset LANGUAGE
+
+usage() {
+  echo "usage: pt35-eth edit INTERFACE" >&2
+  exit 2
+}
+
+[ $# -eq 2 ] || usage
+case "$1" in
+  edit) ;;
+  *) usage ;;
+esac
+command -v nmcli >/dev/null || { echo "nmcli is not installed" >&2; exit 1; }
+iface=$2
+
+# The profile NetworkManager knows this cable by, e.g. "Wired connection 1".
+# Terse `device show` answers GENERAL.CONNECTION:NAME, so drop the field.
+con=$(nmcli -t -f GENERAL.CONNECTION device show "$iface")
+con=${con#*:}
+
+echo "$con on $iface"
+echo
+printf 'IPv4 address with prefix, e.g. 192.168.1.50/24 (blank for DHCP): '
+read -r address
+if [ -z "$address" ]; then
+  # Back to the network's own numbers.
+  nmcli connection modify "$con" ipv4.method auto \
+    ipv4.addresses "" ipv4.gateway "" ipv4.dns ""
+else
+  printf 'Gateway (blank for none): '
+  read -r gateway
+  printf 'DNS server (blank for none): '
+  read -r dns
+  # An empty gateway or DNS clears it rather than failing the command.
+  nmcli connection modify "$con" ipv4.method manual \
+    ipv4.addresses "$address" ipv4.gateway "$gateway" ipv4.dns "$dns"
+fi
+nmcli connection up "$con"

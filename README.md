@@ -51,7 +51,8 @@ menu you drive with the D-pad. A mouse works too, built in or plugged in.
   Mouse mode turns the D-pad into a cursor. R switches.
 - **Mouse and touch.** Hover, click, right click, wheel, and breadcrumbs to go back.
 - **Quick settings.** Wi-Fi, Bluetooth, volume, brightness*, input mode, touch.
-- **Network.** Wi-Fi list and Ethernet.
+- **Network.** Wi-Fi list and Ethernet. The wired row opens its settings:
+  an IPv4 address, a gateway, or back to DHCP.
 - **CPU profiles.** Powersave, balanced and performance.
 - **Local AI agent.** Optional. darkwire in a terminal, on a model the Pi runs itself.
 - **Fast.** Plain Rust, drawn in software. The menu opens in about 75ms on a Pi 5.

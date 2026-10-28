@@ -38,6 +38,7 @@ assets = [
     ["../../scripts/pt35-session", "usr/bin/", "755"],
     ["../../scripts/pt35-kbd", "usr/bin/", "755"],
     ["../../scripts/pt35-quick", "usr/bin/", "755"],
+    ["../../scripts/pt35-eth", "usr/bin/", "755"],
     ["../../scripts/pt35-hello", "usr/bin/", "755"],
     ["../../scripts/pt35-ai", "usr/bin/", "755"],
     ["../../config/systemd/pt35-ai.service", "usr/lib/systemd/system/", "644"],
