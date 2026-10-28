@@ -492,15 +492,26 @@ pub fn quick() -> Items {
     rows
 }
 
-/// The cable: NetworkManager brings it up on its own. Pressing the row opens
-/// the wired settings, where the address is the one thing to choose.
+/// A row that reads its address and opens the settings where the numbers are
+/// typed. The cable's and the radio's rows share one terminal and one prefix,
+/// `net:`: what differs is the interface in the payload.
 fn ethernet_row(iface: &str) -> Item {
     Item {
         label: "Ethernet".into(),
-        payload: format!("eth:{iface}"),
+        payload: format!("net:{iface}"),
         note: address_of(iface).unwrap_or_else(|| "no address".into()),
         icon: "network-wired".into(),
         active: true,
+        ..Item::default()
+    }
+}
+
+fn wifi_row(iface: &str) -> Item {
+    Item {
+        label: "Wi-Fi".into(),
+        payload: format!("net:{iface}"),
+        note: address_of(iface).unwrap_or_else(|| "no address".into()),
+        icon: "network-wireless".into(),
         ..Item::default()
     }
 }
@@ -723,13 +734,22 @@ fn windows() -> Items {
 
 // ------------------------------------------------------------------- wifi
 
-/// The cable first when one is in, then the Wi-Fi networks in range.
+/// The cable first when one is in, then the radio's row, then the Wi-Fi
+/// networks in range. The two rows on top manage addresses; the list below
+/// joins a network.
 fn wifi() -> Items {
-    let ethernet = crate::live::status().and_then(|s| s.ethernet);
-    let mut rows: Items = ethernet
+    let status = crate::live::status();
+    let wired = status.as_ref().and_then(|s| s.ethernet.clone());
+    let mut rows: Items = wired
         .map(|iface| ethernet_row(&iface))
         .into_iter()
         .collect();
+    rows.extend(
+        status
+            .as_ref()
+            .and_then(|s| s.wireless.clone())
+            .map(|iface| wifi_row(&iface)),
+    );
     rows.extend(
         match run(
             "nmcli",
@@ -1457,6 +1477,12 @@ mod provider_tests {
         let out = "3: eth0    inet 192.168.1.20/24 brd 192.168.1.255 scope global eth0\\";
         assert_eq!(parse_address(out).as_deref(), Some("192.168.1.20"));
         assert_eq!(parse_address(""), None);
+    }
+
+    #[test]
+    fn the_address_rows_carry_their_interface() {
+        assert_eq!(ethernet_row("eth0").payload, "net:eth0");
+        assert_eq!(wifi_row("wlan0").payload, "net:wlan0");
     }
 
     #[test]

@@ -1,5 +1,5 @@
 #!/bin/sh
-# pt35-eth: the wired connection settings behind the menu's Ethernet row.
+# pt35-net: the IP settings behind the menu's Ethernet and Wi-Fi rows.
 #
 # A static address is a few values to type, and the menu has no fields to
 # type them into. It opens this script in a terminal instead, the way joining
@@ -11,7 +11,7 @@ export LC_ALL=C.UTF-8
 unset LANGUAGE
 
 usage() {
-  echo "usage: pt35-eth edit INTERFACE" >&2
+  echo "usage: pt35-net edit INTERFACE" >&2
   exit 2
 }
 

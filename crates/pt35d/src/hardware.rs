@@ -112,6 +112,14 @@ impl Hardware {
             .and_then(|i| name(&i))
     }
 
+    /// The Wi-Fi interface, up whenever the radio is on.
+    pub fn wireless(&self) -> Option<String> {
+        self.interfaces()
+            .into_iter()
+            .find(|i| is_wireless(i) && is_up(i))
+            .and_then(|i| name(&i))
+    }
+
     /// Wi-Fi link quality as a percentage, whether or not the cable is the
     /// route. `None` with no Wi-Fi link.
     pub fn network_signal(&self) -> Option<u8> {

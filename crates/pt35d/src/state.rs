@@ -500,6 +500,7 @@ impl Session {
         self.status.muted = muted;
         self.status.network = self.hw.network();
         self.status.ethernet = self.hw.ethernet();
+        self.status.wireless = self.hw.wireless();
         self.status.network_signal = self.hw.network_signal();
         // Reap first. Both helpers exit on their own, and whether the menu is
         // still up decides whether an empty desktop needs one: noticing it

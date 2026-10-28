@@ -53,10 +53,11 @@ fn dynamic(builtin: Builtin, payload: &str) -> Plan {
         // Joining a network may need a passphrase, so it happens in a terminal
         // the user can actually type into. The name goes in as `$1`, never
         // into the script: anyone nearby can name a network `$(...)`.
-        // The `eth:` prefix is the cable's row, asking for the same kind of
-        // place to type in: its script asks for an address and a gateway.
-        Builtin::Wifi => match payload.strip_prefix("eth:") {
-            Some(iface) => in_terminal("pt35-eth", r#"pt35-eth edit "$1"; read -r _"#, iface),
+        // The `net:` prefix is an address row (the cable's or the radio's),
+        // asking for the same kind of place to type in: its script asks for
+        // an address and a gateway.
+        Builtin::Wifi => match payload.strip_prefix("net:") {
+            Some(iface) => in_terminal("pt35-net", r#"pt35-net edit "$1"; read -r _"#, iface),
             None => in_terminal(
                 "pt35-wifi",
                 r#"nmcli --ask device wifi connect "$1"; read -r _"#,
@@ -222,15 +223,15 @@ mod tests {
     }
 
     #[test]
-    fn the_ethernet_row_opens_its_own_terminal() {
-        let iface = r#"eth0$(touch /tmp/pwned)"#;
+    fn an_address_row_opens_its_own_terminal() {
+        let iface = r#"wlan0$(touch /tmp/pwned)"#;
         let Plan::Spawn(argv) = plan(&Command::Dynamic {
             builtin: Builtin::Wifi,
-            payload: format!("eth:{iface}"),
+            payload: format!("net:{iface}"),
         }) else {
             panic!("expected a spawn plan");
         };
-        assert_eq!(argv[..5], ["foot", "-a", "pt35-eth", "sh", "-c"]);
+        assert_eq!(argv[..5], ["foot", "-a", "pt35-net", "sh", "-c"]);
         assert!(!argv[5].contains(iface));
         assert_eq!(argv[6..], ["sh", iface]);
     }

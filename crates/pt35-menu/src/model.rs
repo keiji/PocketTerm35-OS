@@ -714,10 +714,10 @@ impl Model {
                     // A switch stays: watching it flip is the point.
                     "sh" => Step::RunStay(Command::Helper(rest)),
                     "ctl" => Step::RunStay(Command::Action(rest)),
-                    // The cable's settings are typed, so they open in a
-                    // terminal, like joining a network does. The prefix
-                    // stays: exec.rs reads it off the payload.
-                    "eth" => Step::Run(Command::Dynamic {
+                    // An address row opens the settings in a terminal, like
+                    // joining a network does. The prefix stays: exec.rs
+                    // reads it off the payload.
+                    "net" => Step::Run(Command::Dynamic {
                         builtin: Builtin::Wifi,
                         payload: payload.clone(),
                     }),
@@ -973,18 +973,18 @@ entries = [
     }
 
     #[test]
-    fn the_quick_ethernet_row_asks_for_its_terminal() {
+    fn the_quick_address_row_asks_for_its_terminal() {
         let mut model = model();
         model.push_dynamic(
             Builtin::Quick,
             "Quick settings",
-            vec![crate::providers::Item::new("Ethernet", "eth:eth0")],
+            vec![crate::providers::Item::new("Ethernet", "net:eth0")],
         );
         assert_eq!(
             press(&mut model, sym::RETURN),
             Step::Run(Command::Dynamic {
                 builtin: Builtin::Wifi,
-                payload: "eth:eth0".into()
+                payload: "net:eth0".into()
             })
         );
     }

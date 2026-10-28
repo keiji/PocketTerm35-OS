@@ -360,6 +360,10 @@ pub struct Status {
     /// The Ethernet interface with a cable in.
     #[serde(default)]
     pub ethernet: Option<String>,
+    /// The Wi-Fi interface, up whenever the radio is on. On is not joined:
+    /// whether a profile holds an address is nmcli's business.
+    #[serde(default)]
+    pub wireless: Option<String>,
     /// Whether the touchscreen is accepted. Off is for when a palm on the panel
     /// keeps tapping things.
     #[serde(default = "yes")]
